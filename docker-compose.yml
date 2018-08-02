@@ -8,6 +8,7 @@ services:
         volumes:
           - ./hbase/data:/data/hbase
           - ./hbase/zookeeper:/data/zookeeper
+          - ./hbase/code:/code
         ports:
             - 2181:2181 # zookeeper
             - 8080:8080 # HBase Master API port
