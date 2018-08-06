@@ -26,8 +26,55 @@ docker-compose up hbase-standalone
 docker exec -it 7dbsdocker_hbase-standalone_1 /opt/hbase-1.2.1/bin/hbase shell
 ```
 
-### Import wikipedia
+### Import wiktionary
 ```bash
 docker exec -it 7dbsdocker_hbase-standalone_1 /bin/bash
 curl https://dumps.wikimedia.org/enwiktionary/latest/enwiktionary-latest-pages-articles.xml.bz2 | bzcat | /opt/hbase-1.2.1/bin/hbase shell /code/import_from_wikipedia.rb
+```
+
+## Run Hbase cluster in aws
+
+```bash
+sudo apt install awscli
+
+aws configure
+#us-east-1
+
+aws ec2 create-key-pair --key-name HBaseShell --query 'KeyMaterial' --output text > ~/.ssh/hbase-shell-key.pem
+
+chmod 400 ~/.ssh/hbase-shell-key.pem
+
+aws emr create-cluster \
+--name "Seven DBs example cluster" \
+--release-label emr-5.3.1 \
+--ec2-attributes KeyName=HBaseShell \
+--use-default-roles \
+--instance-type m1.large \
+--instance-count 3 \
+--applications Name=HBase
+
+# set variable
+export CLUSTER_ID=
+
+while true; do aws emr describe-cluster --cluster-id ${CLUSTER_ID} --query Cluster.Status.State; sleep 10; done
+
+aws emr describe-cluster --cluster-id ${CLUSTER_ID} --query Cluster.Ec2InstanceAttributes.EmrManagedMasterSecurityGroup
+# set variable
+export SECURITY_GROUP_ID=
+
+export MY_CIDR=$(dig +short myip.opendns.com @resolver1.opendns.com.)/32
+
+aws ec2 authorize-security-group-ingress \
+--group-id ${SECURITY_GROUP_ID} \
+--protocol tcp \
+--port 22 \
+--cidr $MY_CIDR
+
+aws emr ssh --cluster-id ${CLUSTER_ID} --key-pair-file ~/.ssh/hbase-shell-key.pem
+
+# list
+aws emr list-clusters
+
+# terminate
+aws emr terminate-clusters --cluster-ids ${CLUSTER_ID}
 ```
