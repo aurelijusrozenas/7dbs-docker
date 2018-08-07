@@ -13,6 +13,28 @@ git clone git@github.com:aurelijusrozenas/7dbs-docker.git
 cd 7dbs-docker/
 ```
 
+Mongo
+=====
+
+*WARNING (Windows & OS X) - see docker-compose.yml comment* 
+
+```bash
+docker-compose up mongo
+```
+
+`mongo/code` directory is mounted to `/code` in container. Use it to write and run scripts.
+
+## Mongo express
+```bash
+docker-compose up mongo-express
+```
+http://localhost:8081/
+
+## Cli
+```bash
+docker exec -it 7dbsdocker_mongo_1 /bin/bash
+```
+
 Hbase
 =====
 

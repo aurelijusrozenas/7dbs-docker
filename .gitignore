@@ -1,2 +1,3 @@
 /hbase/data/
 /hbase/zookeeper/
+/mongo/db/

@@ -16,3 +16,13 @@ services:
             - 16010:16010 # HBase Master Web UI
             - 16020:16020 # Regionserver API port
             - 16030:16030 # HBase Regionserver web UI
+    mongo:
+        image: mongo:4.0.0-xenial
+        # WARNING (Windows & OS X): this does not work for OSX, comment/delete next two lines
+        volumes:
+            - ./mongo/db:/data/db
+            - ./mongo/code:/code
+    mongo-express:
+        image: mongo-express:0.49.0
+        ports:
+            - 8081:8081
